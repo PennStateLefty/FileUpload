@@ -78,7 +78,6 @@ public class FileUploadController {
 		}
 		storageService.store(file, currentChunk);
 		
-
 		String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/files/").path(fileName).toUriString();
 
 		return new FileResponse(fileName, url, file.getContentType(), file.getSize());
