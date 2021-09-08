@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,7 +58,7 @@ public class FileUploadController {
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
 
-		storageService.store(file);
+		storageService.store(file, -1);
 		redirectAttributes.addFlashAttribute("message",
 				"You successfully uploaded " + file.getOriginalFilename() + "!");
 
@@ -66,9 +67,17 @@ public class FileUploadController {
 
 	@PostMapping("/upload-file")
 	@ResponseBody
-	public FileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-		storageService.store(file);
+	public FileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestHeader(value = "Content-Range", required = false) String contentRange) {
+		int currentChunk = -1;
+		
 		String fileName = file.getOriginalFilename();
+
+		if (contentRange != null && !contentRange.isEmpty() && !contentRange.isBlank()) {
+			//Trim "bytes " from the header
+			currentChunk = calculateChunks(contentRange.substring(contentRange.indexOf(" ")));			
+		}
+		storageService.store(file, currentChunk);
+		
 
 		String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/files/").path(fileName).toUriString();
 
@@ -80,4 +89,17 @@ public class FileUploadController {
 		return ResponseEntity.notFound().build();
 	}
 
+	//An hack method. Will return an integer representing the current chunk. Will return -1 if the chunk is the last
+	private int calculateChunks(String contentRange) {		
+		int totalSize = Integer.parseInt(contentRange.substring(contentRange.indexOf("/")+1));
+		String[] byteRange = contentRange.substring(0, contentRange.indexOf("/")).split("-");
+
+		int chunkSize = Integer.parseInt(byteRange[1].trim()) - Integer.parseInt(byteRange[0].trim());
+
+		if (Integer.parseInt(byteRange[1]) == totalSize) {
+			return -1;
+		} else {
+			return Integer.parseInt(byteRange[1]) / chunkSize;
+		}
+	}
 }

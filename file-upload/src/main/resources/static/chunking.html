@@ -13,12 +13,24 @@
         <script>
             $(function () {
                 $('#fileupload').fileupload({
-                    dataType: 'json',
+                    maxChunkSize: 1000000,
                     done: function (e, data) {
                         $.each(data.result.files, function (index, file) {
                             $('<p></p>').text(file.name).appendTo(document.body);
                         });
                     }
+                })
+                .on('fileuploadchunkbeforesend', function(e, data) {
+                    console.info('Pre-sending chunk');
+                })
+                .on('fileuploadchunksend', function(e, data) {
+                    console.info('Sending chunk');
+                })
+                .on('fileuploadchunkdone', function(e, data) {
+                    console.info('Sending chunk done');
+                })
+                .on('fileuploadchunkfail', function(e, data) {
+                    console.info('Failed to send chunk');
                 });
             });
         </script>
