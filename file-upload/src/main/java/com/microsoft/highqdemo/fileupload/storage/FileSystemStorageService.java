@@ -1,11 +1,14 @@
 package com.microsoft.highqdemo.fileupload.storage;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -20,6 +23,7 @@ import javax.annotation.PostConstruct;
 @Service
 public class FileSystemStorageService implements StorageService {
 
+	Logger logger = LoggerFactory.getLogger(FileSystemStorageService.class);
 	private final Path rootLocation;
 
 	@Autowired
@@ -91,6 +95,7 @@ public class FileSystemStorageService implements StorageService {
 	@Override
 	@PostConstruct
 	public void init() {
+		logger.info("Attempting to write to " + rootLocation.toString());
 		try {
 			if (!Files.isDirectory(rootLocation, LinkOption.NOFOLLOW_LINKS))
 			{	

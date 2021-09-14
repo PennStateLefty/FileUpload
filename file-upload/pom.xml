@@ -12,7 +12,8 @@
 	<artifactId>file-upload</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>file-upload</name>
-	<!--<packaging>war</packaging>-->
+	<!--Comment out the below packaing section to make this standalone again-->
+	<packaging>war</packaging>
 	<description>Demo project to test large file upload</description>
 	<properties>
 		<java.version>16</java.version>
@@ -26,13 +27,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!--
+		<!--Comment out the block below to make this standalone -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
